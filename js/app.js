@@ -8,6 +8,7 @@ $(function () {
 		$select  = $form.find("select#group-assign"),
 		$chkBox  = $form.find("input#is-work-contact"),
 		$modal   = $("#contact-modal"),
+        $layout  = $("#layout"), 
 		orgTitle = $modal.find("#modal-title").html(),
 		promise  = $.getJSON('data/MOCK_DATA_REGULAR.json'),
 		isWorkContact,
@@ -34,7 +35,10 @@ $(function () {
 	//////////////////////
 	// init checkboxes //
 	//////////////////////
+    
+    
 	function addCheckboxes(){
+        
 		$('.contact-item').each(function () {
 			var $widget = $(this),
 				$input = $widget.find('input'),
@@ -53,7 +57,7 @@ $(function () {
 			if($widget.find("span.state-icon").length <= 0){ // If checkbox exists, dont create it again.
 
 				$widget.prepend('<span class="pos-icon state-icon ' + settings[type].off.icon + '"  data-toggle="tooltip" title="Click to sort contact"></span>');
-					
+				
 				$widget.find('.state-icon').on('click', function () {
 					$input.prop('checked', !$input.is(':checked'));
 					updateDisplay();
@@ -173,7 +177,8 @@ $(function () {
 	//////////////////
 	$form.on('submit', function(e) {
 
-		var data = $form.serializeArray(),
+		var 
+            data = $form.serializeArray(),
 			i,
 			len = data.length,
 			key,
@@ -200,7 +205,8 @@ $(function () {
 		if($select.val() == "user" && $("#new-user-list").length > 0){
 			list = $("#new-user-list").val();
 		}
-
+        
+        debugger;
 		if (!isWorkContact) {
 			newContact = new ContactsLib.Contact(tmpObj);
 		} else {

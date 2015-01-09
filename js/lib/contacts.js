@@ -1,4 +1,4 @@
-/* global console, $, jQuery */
+/* global console, $, jQuery, myContact, myContact2 */
 /* jshint eqnull:true */
 
 var ContactsLib = (function($) {
@@ -95,8 +95,8 @@ var ContactsLib = (function($) {
 				prefix: '',
 				number: ''
 			};
-		num.prefix = newstr.slice(0, this.PREFIX_LENGTH);
-		num.number = newstr.slice(this.PREFIX_LENGTH);
+		num.prefix = newstr.slice(0, this.PREFIX_LENGTH); //jshint ignore:line
+		num.number = newstr.slice(this.PREFIX_LENGTH);//jshint ignore:line
 		return num;
 	}
 
@@ -134,7 +134,8 @@ var ContactsLib = (function($) {
 			'somelist no. 3': [myContact, myContact2]
 		};
 		this.name = name;
-	};
+	}
+    
 	ContactsBook.getInstance = function(name) {
 		if (book == null) {
 			book = new ContactsBook(name);
@@ -186,7 +187,6 @@ var ContactsLib = (function($) {
 	ContactsBook.prototype.create = function(name, arr) {
 		if (this.get(name) !== null) {
 			throw "List already defined";
-			return false;
 		}
 		this.lists[name] = new ContactsList(name, arr);
 		return this.lists[name];
@@ -195,7 +195,7 @@ var ContactsLib = (function($) {
 	function Contact(data) {
 		var obj = _initProperties(data, fields);
 		_props(this, obj);
-	};
+	}
 
 	Contact.prototype.validate = function() {
 		var result          = [];
@@ -218,7 +218,7 @@ var ContactsLib = (function($) {
 		_props(this, obj);
 
 		Contact.call(this, data);
-	};
+	}
 
 	_inherit(WorkContact, Contact);
 
@@ -237,7 +237,7 @@ var ContactsLib = (function($) {
 				}
 			}
 		});
-	};
+	}
 
 	PhoneNumber.parse = function(phoneString) {
 		var num = _parseNumber.call(this, phoneString);
@@ -248,7 +248,7 @@ var ContactsLib = (function($) {
 
 	function MobilePhoneNumber(prefix, number) {
 		PhoneNumber.call(this, prefix, number);
-	};
+	}
 
 	_inherit(MobilePhoneNumber, PhoneNumber);
 
@@ -259,10 +259,11 @@ var ContactsLib = (function($) {
 
 	MobilePhoneNumber.PREFIX_LENGTH = 3;
 
-	function ContactsList(name, contacts) {
+	function ContactsList(name, contacts, id) {
+        this.id = id || "";
 		this.name = name;
 		this.contacts = (contacts instanceof Array) ? contacts : [];
-	};
+	}
 	
 	ContactsList.prototype.filter = function(callback) {
 		var i, 
@@ -280,8 +281,9 @@ var ContactsLib = (function($) {
 		len = this.contacts.length, 
 		result = [];
 		for (i = 0; i < len; i++) {
-			if (!callback(this.contacts[i], i, this)) {
+			if (callback(this.contacts[i], i, this)) {
 				result.push(this.contacts[i]);
+                this.contacts.slice(i, i + 1);
 			}
 		}
 		return result;
