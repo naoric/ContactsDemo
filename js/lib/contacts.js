@@ -72,7 +72,7 @@ var ContactsLib = (function($) {
 			attr,
 			obj = {};
 
-		fieldsList = fieldsList == null ? fields : fieldsList;
+		fieldsList = (fieldsList == null) ? fields : fieldsList;
 
 		for (i = fieldsList.length; i >= 0; i--) {
 			if (fieldsList[i] != null) {
@@ -127,12 +127,7 @@ var ContactsLib = (function($) {
 	};
 
 	function ContactsBook(name) {
-		// TODO: remove mock data
-		this.lists = {
-			'somelist no. 1': [myContact, myContact2],
-			'somelist no. 2': [myContact, myContact2],
-			'somelist no. 3': [myContact, myContact2]
-		};
+		this.lists = {};
 		this.name = name;
 	}
     
@@ -141,6 +136,47 @@ var ContactsLib = (function($) {
 			book = new ContactsBook(name);
 		}
 		return book;
+	};
+	/**
+	 * get the highest list's 'id' available
+	 * @return {[Number]}
+	 */
+	ContactsBook.prototype.getListId = function() {
+		var i,
+			num = 0,
+			lists = Object.keys(this.lists),
+			len = lists.length;
+
+		for(i=0; i<len; i++){
+			if(this.lists[lists[i]].id > num){
+				num = this.lists[lists[i]].id
+			}
+		}
+		return num;
+	};
+	/**
+	 * get the highest contact's 'id' available
+	 * @return {[Number]}
+	 */
+	ContactsBook.prototype.getContactId = function() {
+		var i,
+			num = 0,
+			lists = Object.keys(this.lists),
+			contacts,
+			k,
+			len = lists.length,
+			len2;
+
+		for(i=0; i<len; i++){
+			contacts = this.lists[lists[i]].contacts;
+			len2 = contacts.length;
+			for(k = 0; k < len2; k++){
+				if(contacts[k].id > num){
+					num = contacts[k].id;
+				}
+			}
+		}
+		return num;
 	};
 	/**
 	 * [get description]
@@ -159,9 +195,7 @@ var ContactsLib = (function($) {
 			delete this.lists[listName];
 			return;
 		} 
-		
 		console.warn('The list you have requested was not found.');
-		
 	};
 
 	ContactsBook.prototype.add = function(contactsList, override) {
@@ -184,11 +218,21 @@ var ContactsLib = (function($) {
 		this.lists[contactsList.name] = contactsList;
 	};
 
+	/**
+	 * Given a ContactsList name and Array of Contacts
+	 * we create a New ContactsList, OR - 
+	 * adding Contact to an existing list
+	 * @param  {[ContactsList]} name [pass a ContactsList name]
+	 * @param  {[Array]} 		arr  [pass an array of Contacts]
+	 * @return {[ContactsList]}      [Returning a list]
+	 */
 	ContactsBook.prototype.create = function(name, arr) {
 		if (this.get(name) !== null) {
-			throw "List already defined";
+			this.lists[name].contacts.push(arr);
+			console.info("List already defined, just adding contact.");
+		}else{		
+			this.lists[name] = new ContactsList(name, arr);
 		}
-		this.lists[name] = new ContactsList(name, arr);
 		return this.lists[name];
 	};
 
@@ -260,9 +304,9 @@ var ContactsLib = (function($) {
 	MobilePhoneNumber.PREFIX_LENGTH = 3;
 
 	function ContactsList(name, contacts, id) {
-        this.id = id || "";
 		this.name = name;
 		this.contacts = (contacts instanceof Array) ? contacts : [];
+        this.id = id || "";
 	}
 	
 	ContactsList.prototype.filter = function(callback) {
